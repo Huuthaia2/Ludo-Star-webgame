@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  
+<!-- Mirrored from ludo-star.apps.minigame.vip/minigame-index.html?mn_config=https://indigo.minigame.vip/v1/api/channel/indigo/main/game/ludo-star/config&ts=1689042420481 by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 11 Jul 2023 02:29:49 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=utf-8" /><!-- /Added by HTTrack -->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>LUDO PROFESSIONAL</title>
+    <link rel="shortcut icon" href="TemplateData/favicon.ico">
+    <link rel="stylesheet" href="TemplateData/style.css">
+    <script src="minigamea529.js?t=1672122603"></script>
+  </head>
+  <body>
+    <div id="unity-container" class="unity-desktop">
+      <canvas id="unity-canvas" width=960 height=600></canvas>
+      <div id="unity-loading-bar">
+        <div id="unity-logo"></div>
+        <div id="unity-progress-bar-empty">
+          <div id="unity-progress-bar-full"></div>
+        </div>
+      </div>
+      <div id="unity-warning"> </div>
+      <div id="unity-footer">
+        <div id="unity-webgl-logo"></div>
+        <div id="unity-fullscreen-button"></div>
+        <div id="unity-build-title">LUDO PROFESSIONAL</div>
+      </div>
+    </div>
+    <script>
+        function Init() {
+            let date = new Date();
+            let newUser = 0;
+            let now = `${date.getDate()}-${date.getDay()}`;
+            let lastNow = localStorage.getItem("lastNow_ludo_h5_weiyou");
+            let firstNow = localStorage.getItem("firstNow_ludo_weiyou_xx");
+            let count = 0;
+            if (now != lastNow) {
+                localStorage.setItem("lastNow_ludo_h5_weiyou", now);
+                count = 1;
+            }
+
+            if (!firstNow) {
+                newUser = 1;
+            }
+            localStorage.setItem("firstNow_ludo_weiyou_xx", "1");
+            let xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4 && (xhr.status >= 200 && xhr.status < 400)) {
+                    var response = xhr.responseText;
+                    console.log(response);
+                }
+            }
+            xhr.open("GET", `https://www.luozhiming.shop:30001/game/count?channel=ludo_weiyou&dailyCount=${count}&newCount=${newUser}`, true);
+            xhr.send();
+        }
+        Init();
+    </script>
+    <script>
+      var container = document.querySelector("#unity-container");
+      var canvas = document.querySelector("#unity-canvas");
+      var loadingBar = document.querySelector("#unity-loading-bar");
+      var progressBarFull = document.querySelector("#unity-progress-bar-full");
+      var fullscreenButton = document.querySelector("#unity-fullscreen-button");
+      var warningBanner = document.querySelector("#unity-warning");
+
+      // Shows a temporary message banner/ribbon for a few seconds, or
+      // a permanent error message on top of the canvas if type=='error'.
+      // If type=='warning', a yellow highlight color is used.
+      // Modify or remove this function to customize the visually presented
+      // way that non-critical warnings and error messages are presented to the
+      // user.
+      function unityShowBanner(msg, type) {
+        function updateBannerVisibility() {
+          warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
+        }
+        var div = document.createElement('div');
+        div.innerHTML = msg;
+        warningBanner.appendChild(div);
+        if (type == 'error') div.style = 'background: red; padding: 10px;';
+        else {
+          if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
+          setTimeout(function() {
+            warningBanner.removeChild(div);
+            updateBannerVisibility();
+          }, 5000);
+        }
+        updateBannerVisibility();
+      }
+
+      var buildUrl = "Build";
+      var loaderUrl = buildUrl + "/release.loader.js";
+      var config = {
+        dataUrl: buildUrl + "/release.data.unityweb",
+        frameworkUrl: buildUrl + "/release.framework.js.unityweb",
+        codeUrl: buildUrl + "/release.wasm.unityweb",
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "GlayGame",
+        productName: "LUDO PROFESSIONAL",
+        productVersion: "1.0.0",
+        showBanner: unityShowBanner,
+      };
+
+      // By default Unity keeps WebGL canvas render target size matched with
+      // the DOM size of the canvas element (scaled by window.devicePixelRatio)
+      // Set this to false if you want to decouple this synchronization from
+      // happening inside the engine, and you would instead like to size up
+      // the canvas DOM size and WebGL render target sizes yourself.
+      // config.matchWebGLToCanvasSize = false;
+
+      // if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+      //   container.className = "unity-mobile";
+      //   // Avoid draining fillrate performance on mobile devices,
+      //   // and default/override low DPI mode on mobile browsers.
+      //   config.devicePixelRatio = 1;
+      //   unityShowBanner('WebGL builds are not supported on mobile devices.');
+      // } else {
+      //   canvas.style.width = "960px";
+      //   canvas.style.height = "600px";
+      // }
+
+      // 改成unity-mobile，使之全屏显示，否则默认是横屏
+      container.className = "unity-mobile";
+      config.devicePixelRatio = 1;
+      loadingBar.style.display = "block";
+
+      function startUnity(){
+        var script = document.createElement("script");
+        script.src = loaderUrl;
+        script.onload = () => {
+          createUnityInstance(canvas, config, (progress) => {
+            progressBarFull.style.width = 100 * progress + "%";
+          }).then((unityInstance) => {
+            loadingBar.style.display = "none";
+            fullscreenButton.onclick = () => {
+              unityInstance.SetFullscreen(1);              
+            };
+            window.unityInstance = unityInstance;
+          }).catch((message) => {
+            alert(message);
+          });
+        };
+        document.body.appendChild(script);
+      }
+
+      minigame.initializeAsync()
+        .then(function () {
+
+            console.info("minigame initializeAsync..");
+            // 记录启动来源
+            minigame.getEntryPointAsync().then(function(entry){
+                console.info("Entry Point: ", entry);
+            });
+
+            // 记录会话类型
+            const contextType = minigame.context.getType();
+            console.info("Context Type: ", contextType);
+
+            minigame.startGameAsync()
+              .then(function () {
+                  startUnity();
+                  console.info("minigame startGameAsync..");
+              })
+              .catch(function (e) { cc.error(e); });
+
+        });
+      
+    </script>
+  </body>
+
+<!-- Mirrored from ludo-star.apps.minigame.vip/minigame-index.html?mn_config=https://indigo.minigame.vip/v1/api/channel/indigo/main/game/ludo-star/config&ts=1689042420481 by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 11 Jul 2023 02:29:50 GMT -->
+</html>
